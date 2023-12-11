@@ -30,10 +30,7 @@ class Scene():
         self.entity = Entity([self.sprites],image=self.textures['grass'])
         Entity([self.sprites],position=(200,200), image=self.textures['stone'])
 
-        #floor
-        Entity([self.sprites, self.blocks], pygame.Surface((TILESIZE*10,TILESIZE)),position=(400,550))
-
-        self.player = Player([self.sprites], self.textures['player_static'],(600,300),parameters={
+        self.player = Player([self.sprites], self.textures['player_static'],(0,0),parameters={
                                                             'textures':self.textures,
                                                             'group_list':self.group_list,
                                                             'inventory':self.inventory,
@@ -44,6 +41,9 @@ class Scene():
                                                                                                    'player':self.player,
                                                                                                    'damage':1})
         
+        self.chunks: dict[tuple[int, int],Chunk] = {}
+        self.active_chunks: dict[tuple[int, int], Chunk] = {}
+
         self.gen_world()
 
     def gen_solo_textures(self) -> dict:
@@ -64,27 +64,45 @@ class Scene():
                                                                               data['size'][1]))
         return textures
     def gen_world(self):
-        noise_generator =OpenSimplex(seed=92392893)
-
-        heightmap=[]
-        for y in range (6000):
-            noise_value =noise_generator.noise2(y *0.05,0)
-            height = int((noise_value +1)*4+5)
-            heightmap.append(height)
-        
-        for x in range (len(heightmap)):
-            for y in range(heightmap[x]):
-                y_offset =5-y +6
-                block_type = 'dirt'
-                if y== heightmap[x]-1:
-                    block_type='grass'
-                if y<heightmap[x]-5:
-                    block_type='stone'
-                Entity([self.sprites, self.blocks], self.textures[block_type], (x*TILESIZE,y_offset*TILESIZE),name =block_type)
+        pass
 
     def update(self):
         self.sprites.update()
         self.inventory.updata()
+
+        player_chunk_pos = Chunk.get_chunk_pos(self.player.rect.center)
+
+        positions = [
+            player_chunk_pos,
+            (player_chunk_pos[0]-1, player_chunk_pos[1]),
+            (player_chunk_pos[0]+1, player_chunk_pos[1]),
+
+            (player_chunk_pos[0]-1, player_chunk_pos[1]-1),
+            (player_chunk_pos[0]+1, player_chunk_pos[1]-1),
+            (player_chunk_pos[0], player_chunk_pos[1]-1),
+
+            (player_chunk_pos[0]-1, player_chunk_pos[1]+1),
+            (player_chunk_pos[0]+1, player_chunk_pos[1]+1),
+            (player_chunk_pos[0], player_chunk_pos[1]+1),
+        ]
+
+        for position in positions:
+            if position not in self.active_chunks:
+                if position in self.chunks:
+                    self.chunks[position].load_chunk()
+                    self.active_chunks[position] = self.chunks[position]
+                else:
+                    self.chunks[position] = Chunk(position, self.group_list, self.textures)
+                    self.active_chunks[position] = self.chunks[position]
+                print(len(self.sprites.sprites()))
+        
+        target = None
+        for pos, chunk in self.active_chunks.items():
+            if pos not in positions:
+                target = pos
+        if target :
+            self.active_chunks[target].unload_chunk()
+            self.active_chunks.pop(target)        
     def draw(self):
         self.app.screen.fill('lightblue')
         self.inventory.draw()
@@ -104,6 +122,8 @@ class Chunk:
         self.textures = textures
 
         self.blocks: list[Entity] = []
+
+        self.gen_chunk()
     def gen_chunk(self):
         noise_generator =OpenSimplex(seed=92392893)
 
@@ -114,16 +134,39 @@ class Chunk:
             heightmap.append(height)
         
         for x in range (len(heightmap)):
-            for y in range(heightmap[x]):
+            if self.position[1] > 0:
+                height_val = Chunk.CHUNKSIZE
+            elif self.position[1] < 0:
+                height_val = 0
+            else:
+                height_val = heightmap[x]
+
+            for y in range(height_val):
                 y_offset =5-y +6
                 block_type = 'dirt'
                 if y== heightmap[x]-1:
                     block_type='grass'
                 if y<heightmap[x]-5:
                     block_type='stone'
-                
+
+                if self.position[1]>0:
+                    block_type = 'stone'
+                use_type = items[block_type].use_type
+                groups = [self.group_list[group] for group in items[block_type].groups]
+                self.blocks.append(use_type(groups,
+                                            self.textures[block_type],
+                                            (x * TILESIZE + (Chunk.CHUNKPIXELSIZE * self.position[0]),
+                                             (Chunk.CHUNKSIZE - y) * TILESIZE + (Chunk.CHUNKPIXELSIZE * self.position[1])),
+                                             block_type))
 
     def load_chunk(self):
-        pass
+        for block in self.blocks:
+            groups = [self.group_list[group] for group in items[block.name].groups]
+            for group in groups:
+                group.add(block)
     def unload_chunk(self):
-        pass
+        for block in self.blocks:
+            block.kill()
+    @staticmethod
+    def get_chunk_pos(position: tuple[int, int]) -> tuple[int, int]:
+        return (position[0] // Chunk.CHUNKPIXELSIZE, position[1] // Chunk.CHUNKPIXELSIZE)
