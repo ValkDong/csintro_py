@@ -1,13 +1,14 @@
 import pygame
 import sys
+from globals import *
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1280,720))
+        self.screen = pygame.display.set_mode((SCREENWIDTH,SCREENHEIGHT))
+        self.clock = pygame.time.Clock()
     
         self.running =True
-
     def run(self):
         while self.running:
             self.update()
@@ -19,6 +20,7 @@ class Game:
                 self.running =False
 
         pygame.display.update()
+        self.clock.tick()
     def draw(self):
         self.scene.fill('lightblue')
     def close(self):
