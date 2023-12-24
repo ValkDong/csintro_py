@@ -1,17 +1,13 @@
 import pygame
 import sys
-from globals import *
-from scene import Scene
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREENWIDTH,SCREENHEIGHT))
-        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((1280,720))
     
         self.running =True
 
-        self.scene = Scene(self)
     def run(self):
         while self.running:
             self.update()
@@ -22,12 +18,9 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running =False
 
-        self.scene.update()
-
         pygame.display.update()
-        self.clock.tick(FPS)
     def draw(self):
-        self.scene.draw()
+        self.scene.fill('lightblue')
     def close(self):
         pygame.quit()
         sys.exit()
