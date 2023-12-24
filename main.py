@@ -20,7 +20,7 @@ class Game:
                 self.running =False
 
         pygame.display.update()
-        self.clock.tick()
+        self.clock.tick(FPS)
     def draw(self):
         self.scene.fill('lightblue')
     def close(self):
