@@ -53,7 +53,7 @@ class Scene():
             textures[name] = pygame.transform.scale(pygame.image.load(data['file_path']).convert_alpha(),(data['size']))
     
         return textures
-    def gen_atlast_textures(self,filepath):
+    def gen_atlas_textures(self,filepath):
         textures = {}
         atlas_img = pygame.transform.scale(pygame.image.load(filepath).convert_alpha(),(TILESIZE*16,TILESIZE*16))
     
