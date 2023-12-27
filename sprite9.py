@@ -18,7 +18,7 @@ class Mob(Entity):
 
         if parameters:
             self.block_group=parameters['block_group']
-            self.player=parameters[‘player’]
+            self.player=parameters['player']
 
         self.velocity=pygame.math.Vector2()
         self.mass=5
