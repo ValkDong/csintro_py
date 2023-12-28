@@ -1,6 +1,7 @@
 import pygame
 from globals import *
 from events import EventHandler
+from
 
 class Player(pygame.sprite.Sprite):
     def__init__(self,groups,image:pygame.Surface,position:tuple,parameters:dict)-> None:
