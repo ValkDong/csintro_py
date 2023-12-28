@@ -6,7 +6,7 @@ from world.texturedata import solo_texture_data, atlas_texture_data
 from opensimplex import OpenSimplex
 from camera import Camera
 from inventory.inventory import Inventory
-from world.items import *
+from world.items import * 
 
 class Scene():
     def __init__(self, app) -> None:
