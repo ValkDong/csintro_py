@@ -18,7 +18,7 @@ class Game:
             self.draw()
         self.close()
     def update(self): 
-        EventHandler.poll_event()
+        EventHandler.poll_events()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running =False
