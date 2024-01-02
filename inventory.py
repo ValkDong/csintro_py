@@ -1,5 +1,5 @@
-from globals import
-from world.items import
+from globals import *
+from world.items import *
 from events import EventHandler
 
 class Inventory:
@@ -11,9 +11,9 @@ class Inventory:
         self.slots =[]
         for index in range(5):
             self.slots.append(Item())
-        self.slots[0] = ShortSworditem('short_sword',1)
-        self.slots[1] = BlockItem( 'grass'，5)
-        self.slots[2] = BlockItem('dirt'，3)
+        self.slots[0] = ShortSwordItem('short_sword',1)
+        self.slots[1] = BlockItem( 'grass',5)
+        self.slots[2] = BlockItem('dirt',3)
         self.slots[3] = BlockItem('stone',3)
 
         self.active_slot = 0
@@ -23,7 +23,7 @@ class Inventory:
         for slot in self.slots:
             print(slot)
     def use(self,player,position):
-        print(f'ACTIVE SLOT:{self.slots[self.active_slot]}')
+        print(f'ACTIVE SLOT:{self.slots[self.active_slot]})
         if self.slots[self.active_slot].name != "default":
             self.slots[self.active_slot].use(player, position)
     def add_item(self,item):
@@ -51,18 +51,18 @@ class Inventory:
             if EventHandler.clicked_any():
                 self.debug()
     def draw(self):
-        pygame.draw.rect(self.screen,"gray",pygame.Rect(0,0,(TILESIZE*2)*len(self.slots)，TILESIZE*2))
+        pygame.draw.rect(self.screen,"gray",pygame.Rect(0,0,(TILESIZE*2)*len(self.slots),TILESIZE*2))
 
         x offset = TILESIZE/2
         y_offset = TILESIZE/2
         
         for i in range(len(self.slots)):
             if i == self.active_slot:
-                pygame.draw.rect(self.screen,"white",pygame.Rect(i*(TILESIZE*2),0,TILESIZE*2，TILESIZE*2))
-            pygame.draw.rect(self.screen,"black",pygame.Rect(i*(TILESIZE*2)，0，TILESIZE*2，TILESIZE*2),2)
+                pygame.draw.rect(self.screen,"white",pygame.Rect(i*(TILESIZE*2),0,TILESIZE*2,TILESIZE*2))
+            pygame.draw.rect(self.screen,"black",pygame.Rect(i*(TILESIZE*2),0,TILESIZE*2,TILESIZE*2),2)
             if self.slots[i].name != "default":
                 self.screen.blit(self.textures[self.slots[i].name],((TILESIZE*2)*i + 5,5))
 
                 self.amount_text = self.font.render(str(self.slots[i].quantity),True,"black")
                 self.screen.blit(self.amount_text,(x_offset + (TILESIZE*2)*i + y_offset))
-        pygame.draw.rect(self.screen,"black",pygame.Rect(0,0,(TILESIZE*2)*len(self.slots)，TILESIZE*2))
+        pygame.draw.rect(self.screen,"black",pygame.Rect(0,0,(TILESIZE*2)*len(self.slots),TILESIZE*2))
