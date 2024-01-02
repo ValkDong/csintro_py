@@ -53,12 +53,12 @@ def move(self):
         self.velocity.x = 0
         
     self.rect.x += self.velocity.x * PLAYERSPEED
-    self.check collisions('horizontal')
+    self.check_collisions('horizontal')
     self.rect.y += self.velocity.y 
     self.check_collisions('vertical')
 
     if self.grounded and self.attacking and abs(self.velocity.x) < 0.1:
-    self.velocity.y = -8
+        self.velocity.y = -8
 def check_collisions(self,direction):
     if direction == "horizontal":
         for block in self.block_group:
